@@ -347,115 +347,124 @@ class TransactionService
 
     public function updateExpense(Transaction $transaction, array $data)
     {
-        // Handle file upload
-        if (isset($data['attachment_expense']) && $data['attachment_expense'] instanceof UploadedFile) {
-            $filePath = $data['attachment_expense']->store('attachments', 'public');
-            $data['attachment_expense'] = $filePath;
-            $transaction->attachment = $filePath;
-        }
+        // Start a database transaction
+        DB::beginTransaction();
 
-        // Update Event Association
-        if (isset($data['event_expense'])) {
-            if ((int) $data['event_expense'] != $transaction->id_ref) {
-                // Remove expense from old event
-                $oldEvent = Events::findOrFail($transaction->id_ref);
-                $newOldBalance = $oldEvent->expenses - $transaction->amount;
-                $oldEvent->update(['expenses' => $newOldBalance]);
+        try {
+            $oldAmount = $transaction->amount;
+            $newAmount = $data['amount_expense'];
+            $amountDifference = $oldAmount - $newAmount;
 
-                // Add expense to new event
-                $newEvent = Events::findOrFail($data['event_expense']);
-                $newNewBalance = $newEvent->expenses + $data['amount_expense'];
-                $newEvent->update(['expenses' => $newNewBalance]);
+            // Update the transaction first
+            $transaction->fill([
+                'category' => $data['category_expense'],
+                'amount' => $newAmount,
+                'description' => $data['desc_expense'],
+                'trans_date' => $data['trans_date_expense'],
+            ]);
 
-                // Update transaction event reference
-                $transaction->id_ref = $data['event_expense'];
-            } else {
-                // If the event remains the same, adjust expense within the same event
-                $event = Events::findOrFail($transaction->id_ref);
-                $event->update(['expenses' => $event->expenses - $transaction->amount + $data['amount_expense']]);
+            // Handle file upload
+            if (isset($data['attachment_expense']) && $data['attachment_expense'] instanceof UploadedFile) {
+                $filePath = $data['attachment_expense']->store('attachments', 'public');
+                $transaction->attachment = $filePath;
             }
-        }
 
-        // Update Wallet Association
-        if ((int) $data['wallet_expense'] != $transaction->wallet_id) {
-            // Deduct the old transaction amount from the old wallet
-            $oldWallet = Wallets::findOrFail($transaction->wallet_id);
-            $newOldWalletBalance = $oldWallet->amount - $transaction->amount;
-            $oldWallet->update(['amount' => $newOldWalletBalance]);
+            // Update Event Association
+            if (isset($data['event_expense'])) {
+                $newEventId = (int) $data['event_expense'];
+                if ($newEventId != $transaction->id_ref) {
+                    // Remove expense from old event
+                    $oldEvent = Events::findOrFail($transaction->id_ref);
+                    $oldEvent->expenses -= $oldAmount;
+                    $oldEvent->save();
 
-            // Add the new transaction amount to the new wallet
-            $newWallet = Wallets::findOrFail($data['wallet_expense']);
-            $newNewWalletBalance = $newWallet->amount + $data['amount_expense'];
-            $newWallet->update(['amount' => $newNewWalletBalance]);
+                    // Add expense to new event
+                    $newEvent = Events::findOrFail($newEventId);
+                    $newEvent->expenses += $newAmount;
+                    $newEvent->save();
 
-            // Update the wallet reference in the transaction
-            $transaction->wallet_id = $data['wallet_expense'];
-        } else {
-            // If the wallet remains the same but the amount has changed
-            $wallet = Wallets::findOrFail($transaction->wallet_id);
+                    $transaction->id_ref = $newEventId;
+                } else {
+                    // If the event remains the same, adjust expense within the same event
+                    $event = Events::findOrFail($transaction->id_ref);
+                    $event->expenses -= $amountDifference;
+                    $event->save();
+                }
+            }
 
-            // Calculate the difference between the old and new amounts
-            $amountDifference = $transaction->amount - $data['amount_expense'];
+            // Update Wallet Association
+            $newWalletId = (int) $data['wallet_expense'];
+            if ($newWalletId != $transaction->wallet_id) {
+                // Add the old transaction amount back to the old wallet
+                $oldWallet = Wallets::findOrFail($transaction->wallet_id);
+                $oldWallet->amount += $oldAmount;
+                $oldWallet->save();
 
-            // Update the wallet balance with the difference
-            $wallet->update(['amount' => $wallet->amount + $amountDifference]);
-        }
+                // Subtract the new transaction amount from the new wallet
+                $newWallet = Wallets::findOrFail($newWalletId);
+                $newWallet->amount -= $newAmount;
+                $newWallet->save();
 
-        // Update Budget Association
-        if ($data['allocate_budget_update'] == 'on') {
-            if ($data['update_budget'] != $transaction->budget_id) {
-                // If the budget has changed, revert old budget and update new budget
-                if ($transaction->budget_id != null) {
-                    $oldBudget = $this->budgetsService->getBudgetById($transaction->budget_id);
-                    if ($oldBudget) {
-                        $oldBalance = $oldBudget->current_amount + $transaction->amount;
-                        $oldBudget->update(['current_amount' => $oldBalance]);
+                $transaction->wallet_id = $newWalletId;
+            } else {
+                // If the wallet remains the same but the amount has changed
+                $wallet = Wallets::findOrFail($transaction->wallet_id);
+                if ($data['amount_expense'] > $wallet->amount) {
+                    $wallet->amount -= $amountDifference;
+                } else {
+                    $wallet->amount += $amountDifference;
+                }
+                $wallet->save();
+            }
+
+            // Update Budget Association
+            if (isset($data['allocate_budget_update'])) {
+                if ($data['allocate_budget_update'] == 'on') {
+                    $newBudgetId = $data['update_budget'];
+                    if ($newBudgetId != $transaction->budget_id) {
+                        // If the budget has changed, revert old budget and update new budget
+                        if ($transaction->budget_id != null) {
+                            $oldBudget = $this->budgetsService->getBudgetById($transaction->budget_id);
+                            $oldBudget->current_amount += $oldAmount;
+                            $oldBudget->save();
+                        }
+
+                        // Update the new budget
+                        $newBudget = $this->budgetsService->getBudgetById($newBudgetId);
+                        $newBudget->current_amount -= $newAmount;
+                        $newBudget->save();
+                        $transaction->budget_id = $newBudgetId;
                     } else {
-                        throw new \Exception('Old Budget not found');
+                        // If the budget remains the same, just update the amount difference
+                        $budget = $this->budgetsService->getBudgetById($transaction->budget_id);
+                        $budget->current_amount += $amountDifference;
+                        $budget->save();
+                    }
+                } else {
+                    // If budget allocation is turned off, remove it from the current budget
+                    if ($transaction->budget_id != null) {
+                        $oldBudget = $this->budgetsService->getBudgetById($transaction->budget_id);
+                        $oldBudget->current_amount += $oldAmount;
+                        $oldBudget->save();
+                        $transaction->budget_id = null;
                     }
                 }
-
-                // Update the new budget
-                $newBudget = $this->budgetsService->getBudgetById($data['update_budget']);
-                if ($newBudget) {
-                    $newBalance = $newBudget->current_amount - $data['amount_expense'];
-                    $newBudget->update(['current_amount' => $newBalance]);
-                    $transaction->budget_id = $data['update_budget']; // Update transaction with new budget ID
-                } else {
-                    throw new \Exception('New Budget not found');
-                }
             } else {
-                // If the budget remains the same, just update the amount difference
-                $budget = $this->budgetsService->getBudgetById($transaction->budget_id);
-                if ($budget) {
-                    $amountDifference = $transaction->amount - $data['amount_expense'];
-                    $newBalance = $budget->current_amount + $amountDifference;
-                    $budget->update(['current_amount' => $newBalance]);
-                } else {
-                    throw new \Exception('Budget not found');
+                if ($transaction->budget_id != null) {
+                    $oldBudget = $this->budgetsService->getBudgetById($transaction->budget_id);
+                    $oldBudget->current_amount += $oldAmount;
+                    $oldBudget->save();
                 }
+                $transaction->budget_id = null;
             }
-        } else {
-            // If budget allocation is turned off, remove it from the current budget
-            if ($transaction->budget_id != null) {
-                $oldBudget = $this->budgetsService->getBudgetById($transaction->budget_id);
-                if ($oldBudget) {
-                    $oldBalance = $oldBudget->current_amount + $transaction->amount;
-                    $oldBudget->update(['current_amount' => $oldBalance]);
-                } else {
-                    throw new \Exception('Old Budget not found');
-                }
-            }
-            $transaction->budget_id = null;
+
+            $transaction->save();
+
+            DB::commit();
+            return $transaction;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
         }
-
-        $transaction->update([
-            'category' => $data['category_expense'],
-            'amount' => $data['amount_expense'],
-            'description' => $data['desc_expense'],
-            'trans_date' => $data['trans_date_expense'],
-        ]);
-
-        return $transaction;
     }
 }
