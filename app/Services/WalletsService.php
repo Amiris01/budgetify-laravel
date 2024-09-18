@@ -6,6 +6,7 @@ use App\Models\Transaction;
 use App\Models\Wallets;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class WalletsService
 {
@@ -28,6 +29,7 @@ class WalletsService
             $formattedData[$newKey] = $value;
         }
 
+        Alert::success('Wallet Created', 'Wallet has been created successfully.');
         return Wallets::create($formattedData);
     }
 
@@ -39,6 +41,7 @@ class WalletsService
     public function update(Wallets $wallet, array $data)
     {
         $wallet->update($data);
+        Alert::success('Wallet Updated', 'Wallet has been updated successfully.');
         return $wallet;
     }
 
@@ -91,6 +94,7 @@ class WalletsService
     public function deleteWallet($id)
     {
         if ($this->checkActiveTransactions($id)) {
+            Alert::error('Delete Failed', 'Cannot delete the wallet. It has active transactions.');
             return response()->json([
                 'status' => 'error',
                 'message' => 'Cannot delete the wallet. It has active transactions.'
@@ -102,11 +106,13 @@ class WalletsService
         if ($wallet) {
             $wallet->delete();
 
+            Alert::success('Wallet deleted', 'Wallet has been deleted succesfully.');
             return response()->json([
                 'status' => 'success',
                 'message' => 'Wallet successfully deleted.'
             ]);
         } else {
+            Alert::error('Delete Failed', 'No wallet found with the provided ID.');
             return response()->json([
                 'status' => 'error',
                 'message' => 'No wallet found with the provided ID.'

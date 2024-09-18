@@ -7,6 +7,7 @@ use App\Models\Transaction;
 use App\Models\Wallets;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class BudgetsService
 {
@@ -30,6 +31,7 @@ class BudgetsService
             $formattedData[$newKey] = $value;
         }
 
+        Alert::success('Budget Created', 'Budget has been created successfully.');
         return Budgets::create($formattedData);
     }
 
@@ -41,6 +43,7 @@ class BudgetsService
     public function update(Budgets $budget, array $data)
     {
         $budget->update($data);
+        Alert::success('Budget Updated', 'Budget has been updated successfully.');
         return $budget;
     }
 
@@ -143,12 +146,14 @@ class BudgetsService
 
             DB::commit();
 
+            Alert::success('Budget deleted', 'Event successfully deleted along with associated data based on your choices.');
             return response()->json([
                 'status' => 'success',
                 'message' => 'Event successfully deleted along with associated data based on your choices.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+            Alert::error('Cannot Delete Budget.', 'An error occurred: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred: ' . $e->getMessage()
