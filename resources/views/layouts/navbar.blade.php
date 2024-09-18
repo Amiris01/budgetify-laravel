@@ -21,7 +21,8 @@
                     <a class="nav-link {{ Route::is('apparels.index') ? 'active' : '' }}"
                         href="{{ route('apparels.index') }}">Apparels</a>
 
-                    <a class="nav-link {{ Route::is('events.index') ? 'active' : '' }}" href="{{ route('events.index') }}">Events</a>
+                    <a class="nav-link {{ Route::is('events.index') ? 'active' : '' }}"
+                        href="{{ route('events.index') }}">Events</a>
 
                     <div class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle {{ Route::is('wallets.index') || Route::is('budgets.index') || Route::is('transactions.index') ? 'active' : '' }}"
@@ -43,15 +44,29 @@
 
             <div class="navbar-nav ms-auto">
                 @auth
-                    <form id="logoutForm" action="{{ route('logout') }}" method="POST" style="display: inline;">
-                        @csrf
-                        <button type="submit" class="nav-link btn btn-link">Logout</button>
-                    </form>
-                    @else
-                        <a class="nav-link {{ Route::is('login') ? 'active' : '' }}" href="{{ route('login') }}">Login</a>
-                        <a class="nav-link {{ Route::is('register') ? 'active' : '' }}"
-                            href="{{ route('register') }}">Register</a>
-                    @endauth
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{ request()->routeIs('userInfo.index') ? 'active' : '' }}"
+                            href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            {{ Str::ucfirst(session('name')) }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown" style="">
+                            <li><a class="dropdown-item {{ request()->routeIs('userInfo.index') ? 'active' : '' }}"
+                                    href="{{ route('userInfo.index') }}">Edit Profile</a></li>
+                            <li>
+                                <form id="logoutForm" action="{{ route('logout') }}" method="POST"
+                                    style="margin-left: 8px;">
+                                    @csrf
+                                    <button type="submit" class="nav-link btn btn-link">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                @else
+                    <a class="nav-link {{ Route::is('login') ? 'active' : '' }}" href="{{ route('login') }}">Login</a>
+                    <a class="nav-link {{ Route::is('register') ? 'active' : '' }}"
+                        href="{{ route('register') }}">Register</a>
+                @endauth
             </div>
         </div>
     </div>
