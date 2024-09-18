@@ -6,6 +6,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\EventsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\UserInfoController;
 use App\Http\Controllers\WalletsController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('wallets', WalletsController::class);
     Route::resource('budgets', BudgetsController::class);
     Route::resource('events', EventsController::class);
+    Route::resource('userInfo', UserInfoController::class);
     Route::resource('transactions', TransactionController::class);
     Route::get('/getCalendarData', [CalendarController::class, 'getCalendarData'])->name('getCalendar');
     Route::get('/getBudgetByCategory', [BudgetsController::class, 'getBudgetByCategory'])->name('getBudget');
