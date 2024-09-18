@@ -9,6 +9,7 @@ use App\Services\ApparelsService;
 use App\Services\ApparelTypeService;
 use App\Services\BrandsService;
 use App\Services\StyleService;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class ApparelsController extends Controller
 {
@@ -90,6 +91,7 @@ class ApparelsController extends Controller
     public function destroy(Apparels $apparel)
     {
         $apparel->delete();
+        Alert::success('Apparel has been deleted', 'Your apparel has been deleted successfully.');
         return redirect()->route('apparels.index')->with('success', 'Apparel deleted successfully');
     }
 }

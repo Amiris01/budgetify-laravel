@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class EventsService
 {
@@ -44,6 +45,7 @@ class EventsService
             $formattedData[$newKey] = $value;
         }
 
+        Alert::success('Event Created', 'Event has been created successfully.');
         return Events::create($formattedData);
     }
 
@@ -66,6 +68,7 @@ class EventsService
         $data['end_timestamp'] = $endTimestamp;
 
         $event->update($data);
+        Alert::success('Event Updated', 'Event has been updated successfully.');
         return $event;
     }
 
@@ -127,7 +130,11 @@ class EventsService
 
     public function deleteEvent($data, Events $event)
     {
-        $transactionOption = $data['transactionOption'];
+        if(isset($data['transactionOption'])){
+            $transactionOption = $data['transactionOption'];
+        }else{
+            $transactionOption = 'retain';
+        }
 
         try {
             DB::beginTransaction();
@@ -146,6 +153,14 @@ class EventsService
             }
 
             $event->delete();
+
+            if($transactionOption == 'nullify'){
+                Alert::success('Event deleted', 'Event has been deleted successfully and its transactions has been nullified.');
+            }else if($transactionOption == 'delete'){
+                Alert::success('Event deleted', 'Event and its related transactions has been deleted successfully.');
+            }else{
+                Alert::success('Event deleted', 'Event has been deleted successfully.');
+            }
 
             DB::commit();
 

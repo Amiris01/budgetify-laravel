@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Models\Apparels;
 use Illuminate\Support\Facades\Session;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class ApparelsService{
 
@@ -24,6 +25,7 @@ class ApparelsService{
             $formattedData[$newKey] = $value;
         }
 
+        Alert::success('Apparel Added', 'Apparel has been added successfully.');
         return Apparels::create($formattedData);
     }
 
@@ -35,6 +37,7 @@ class ApparelsService{
     public function update(Apparels $apparel, array $data)
     {
         $apparel->update($data);
+        Alert::success('Apparel Updated', 'Apparel has been updated successfully.');
         return $apparel;
     }
 

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class NewPasswordController extends Controller
 {
@@ -46,6 +47,7 @@ class NewPasswordController extends Controller
                     'remember_token' => Str::random(60),
                 ])->save();
 
+                Alert::success('Password Changed', 'Your password has been changed successfully.');
                 event(new PasswordReset($user));
             }
         );

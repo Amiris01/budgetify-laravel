@@ -9,6 +9,7 @@ use App\Models\Wallets;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class TransactionService
 {
@@ -112,8 +113,10 @@ class TransactionService
         }
 
         if ($data['trans_type'] == 'Income') {
+            Alert::success('Income added', 'Income has been added successfully');
             return Transaction::create($formattedData);
         } else {
+            Alert::success('Expense added', 'Expense has been added successfully');
             return Transaction::create($data);
         }
     }
@@ -277,6 +280,7 @@ class TransactionService
             }
         }
 
+        Alert::success('Transaction Deleted', 'Transaction has been deleted successfully');
         $transaction->delete();
     }
 
@@ -299,20 +303,22 @@ class TransactionService
             $data['attachment_income'] = $filePath;
         }
 
-        if ((int) $data['event_id_income'] != $transaction->id_ref) {
-            $data['id_ref'] = $data['event_id_income'];
-            $oldEvent = Events::findOrFail($transaction->id_ref);
-            $newOldBalance = $oldEvent->income - $transaction->amount;
-            $oldEvent->update(['income' => $newOldBalance]);
+        if(isset($data['event_id_income'])){
+            if ((int) $data['event_id_income'] != $transaction->id_ref) {
+                $data['id_ref'] = $data['event_id_income'];
+                $oldEvent = Events::findOrFail($transaction->id_ref);
+                $newOldBalance = $oldEvent->income - $transaction->amount;
+                $oldEvent->update(['income' => $newOldBalance]);
 
-            $newEvent = Events::findOrFail($data['event_id_income']);
-            $newNewBalance = $newEvent->income + $data['amount_income'];
-            $newEvent->update(['income' => $newNewBalance]);
+                $newEvent = Events::findOrFail($data['event_id_income']);
+                $newNewBalance = $newEvent->income + $data['amount_income'];
+                $newEvent->update(['income' => $newNewBalance]);
 
-            $transaction->id_ref = $data['event_id_income'];
-        } else {
-            $event = Events::findOrFail($transaction->id_ref);
-            $event->update(['income' => $event->income - $transaction->amount + $data['amount_income']]);
+                $transaction->id_ref = $data['event_id_income'];
+            } else {
+                $event = Events::findOrFail($transaction->id_ref);
+                $event->update(['income' => $event->income - $transaction->amount + $data['amount_income']]);
+            }
         }
 
         if ((int) $data['wallet_id_income'] != $transaction->wallet_id) {
@@ -341,6 +347,7 @@ class TransactionService
             }
         }
 
+        Alert::success('Income updated', 'Income has been updated successfully');
         $transaction->update($formattedData);
         return $transaction;
     }
@@ -459,6 +466,7 @@ class TransactionService
             }
 
             $transaction->save();
+            Alert::success('Expense updated', 'Expense has been updated successfully');
 
             DB::commit();
             return $transaction;
