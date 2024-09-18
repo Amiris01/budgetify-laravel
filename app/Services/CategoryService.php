@@ -31,7 +31,8 @@ class CategoryService
             })
             ->leftJoin('transactions', function ($join) use ($id) {
                 $join->on('transactions.category', '=', 'category.id')
-                    ->where('transactions.user_id', '=', $id);
+                    ->where('transactions.user_id', '=', $id)
+                    ->where('transactions.budget_id', '!=', null);
             })
             ->where('category.tag', 'Expense')
             ->groupBy('category.name')
@@ -66,7 +67,8 @@ class CategoryService
             })
             ->leftJoin('transactions', function ($join) use ($id) {
                 $join->on('transactions.category', '=', 'category.id')
-                    ->where('transactions.user_id', $id);
+                    ->where('transactions.user_id', $id)
+                    ->where('transactions.budget_id', '!=', null);
             })
             ->groupBy('category.name', 'budgets.total_amount')
             ->havingRaw('actual > budgeted');
