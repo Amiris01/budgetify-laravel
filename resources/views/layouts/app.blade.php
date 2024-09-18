@@ -38,5 +38,7 @@
 
         {{-- Page-specific scripts --}}
         @stack('scripts')
+
+        @include('sweetalert::alert')
     </body>
 </html>
