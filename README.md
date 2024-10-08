@@ -1,4 +1,4 @@
-<p align="center"><img src="public/images/favicon.ico" width="400" alt="Budgetify Logo"></p>
+<p align="center"><img src="public/images/favicon.ico" width="30" alt="Budgetify Logo"></p>
 
 # Budgetify
 
