@@ -124,6 +124,7 @@
                         <form id="addForm" enctype="multipart/form-data" method="POST"
                             action="{{ route('apparels.store') }}">
                             @csrf
+                            <input type="hidden" name="apparelType" id="apparelType" value="gift">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -174,15 +175,6 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="price1" class="form-label"><small><b>Price</b></small></label>
-                                        <input type="number" name="price1" id="price1"
-                                            class="form-control form-control-sm" step="0.01">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
                                         <label for="style1" class="form-label"><small><b>Style</b></small></label>
                                         <select name="style1" id="style1" class="form-select form-select-sm">
                                             <option value="" hidden>Select Apparel Style</option>
@@ -190,14 +182,6 @@
                                                 <option value="{{ $style->id }}">{{ $style->name }}</option>
                                             @endforeach
                                         </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="purchase_date1" class="form-label"><small><b>Purchase
-                                                    Date</b></small></label>
-                                        <input type="date" name="purchase_date1" id="purchase_date1"
-                                            class="form-control form-control-sm">
                                     </div>
                                 </div>
                             </div>
@@ -211,6 +195,155 @@
                         <button type="submit" class="btn btn-primary btn-sm" id="add-apparel">Save changes</button>
                     </div>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="add-transaction-form" tabindex="-1" aria-labelledby="addFormLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header py-2">
+                        <h5 class="modal-title" id="addFormLabel">Add Apparels</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addForm" enctype="multipart/form-data" method="POST"
+                            action="{{ route('apparels.store') }}">
+                            @csrf
+                            <input type="hidden" name="apparelType" id="apparelType" value="transaction">
+                            <input type="hidden" name="table_ref" id="table_ref" value="apparels">
+                            <input type="hidden" name="trans_type" id="trans_type" value="Expense">
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-6">
+                                    <label for="category" class="form-label"><b>Category</b></label>
+                                    <select class="form-select form-select-sm" id="category" name="category">
+                                        <option value="" selected disabled>Select Category</option>
+                                        @foreach ($expenseCategory as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="amount" class="form-label"><b>Amount</b></label>
+                                    <input type="number" name="amount" id="amount"
+                                        class="form-control form-control-sm" step="0.01" />
+                                </div>
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-6">
+                                    <label for="wallet_id" class="form-label"><b>Wallet</b></label>
+                                    <select class="form-select form-select-sm" id="wallet_id" name="wallet_id">
+                                        <option value="" selected disabled>Select Wallet</option>
+                                        @foreach ($wallets as $wallet)
+                                            <option value="{{ $wallet->id }}">
+                                                {{ $wallet->name . ' (' . $wallet->financialInstitute->name . ')' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="trans_date" class="form-label"><b>Transaction Date</b></label>
+                                    <input type="date" name="trans_date" id="trans_date"
+                                        class="form-control form-control-sm" />
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label for="description" class="form-label"><b>Description</b></label>
+                                <textarea name="description" id="description" cols="5" class="form-control form-control-sm"></textarea>
+                            </div>
+                            <div class="mb-2">
+                                <label for="attachment" class="form-label"><b>Attachment</b></label>
+                                <input type="file" name="attachment" id="attachment"
+                                    class="form-control form-control-sm">
+                            </div>
+                            <div class="form-check mb-2">
+                                <input type="checkbox" class="form-check-input" id="allocate_budget"
+                                    name="allocate_budget" />
+                                <label class="form-check-label" for="allocate_budget"><b>Allocate to Budget?</b></label>
+                            </div>
+                            <div class="mb-2" id="budgetSection" style="display: none;">
+                                <label for="budget_id" class="form-label"><b>Budget</b></label>
+                                <select class="form-select form-select-sm" id="budget_id" name="budget_id">
+                                    <option value="" selected disabled>Select Budget</option>
+                                </select>
+                            </div>
+
+                            <!-- Apparel Section -->
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-6">
+                                    <label for="type1" class="form-label"><small><b>Type</b></small></label>
+                                    <select name="type1" id="type1" class="form-select form-select-sm">
+                                        <option value="" hidden>Select Apparel Type</option>
+                                        @foreach ($apparelType as $type)
+                                            <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="size1" class="form-label"><small><b>Size</b></small></label>
+                                    <input type="text" name="size1" id="size1"
+                                        class="form-control form-control-sm">
+                                </div>
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-6">
+                                    <label for="color1" class="form-label"><small><b>Color</b></small></label>
+                                    <input type="text" name="color1" id="color1"
+                                        class="form-control form-control-sm">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="quantity1" class="form-label"><small><b>Quantity</b></small></label>
+                                    <input type="number" name="quantity1" id="quantity1"
+                                        class="form-control form-control-sm">
+                                </div>
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-6">
+                                    <label for="brand1" class="form-label"><small><b>Brand</b></small></label>
+                                    <select name="brand1" id="brand1" class="form-select form-select-sm">
+                                        <option value="" hidden>Select Apparel Brand</option>
+                                        @foreach ($brands as $brand)
+                                            <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="price1" class="form-label"><small><b>Price</b></small></label>
+                                    <input type="number" name="price1" id="price1"
+                                        class="form-control form-control-sm" step="0.01">
+                                </div>
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-6">
+                                    <label for="style1" class="form-label"><small><b>Style</b></small></label>
+                                    <select name="style1" id="style1" class="form-select form-select-sm">
+                                        <option value="" hidden>Select Apparel Style</option>
+                                        @foreach ($styles as $style)
+                                            <option value="{{ $style->id }}">{{ $style->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="purchase_date1" class="form-label"><small><b>Purchase
+                                                Date</b></small></label>
+                                    <input type="date" name="purchase_date1" id="purchase_date1"
+                                        class="form-control form-control-sm">
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label for="remarks1" class="form-label"><small><b>Remarks</b></small></label>
+                                <textarea name="remarks1" id="remarks1" class="form-control form-control-sm" rows="2"></textarea>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm"
+                                    data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary btn-sm" id="add-apparel">Save
+                                    changes</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -422,6 +555,29 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="allocationModal" tabindex="-1" aria-labelledby="allocationModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header pb-4 pt-3 px-3">
+                        <h5 class="modal-title" id="allocationModalLabel">Choose Apparel Type</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center pb-5 pt-4 px-3">
+                        <div class="d-flex justify-content-around">
+                            <button type="button" class="btn btn-outline-success btn-lg rounded-pill" id="giftButton">
+                                <i class="fas fa-gift me-2"></i> Gift
+                            </button>
+                            <button type="button" class="btn btn-outline-primary btn-lg rounded-pill"
+                                id="transactionButton">
+                                <i class="fas fa-exchange-alt me-2"></i> Transaction
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     @endsection
 
     @push('styles')
@@ -534,7 +690,7 @@
     @push('scripts')
         <script>
             $('.addApparel').click(function() {
-                $('#add-form').modal('show');
+                $('#allocationModal').modal('show');
             });
 
             $('.action-icon').click(function() {
@@ -646,6 +802,82 @@
 
             $('#confirmDelete').click(function() {
                 $('#deleteForm').submit();
+            });
+
+            $('#giftButton').click(function() {
+                $('#allocationModal').modal('hide');
+                $('#add-form').modal('show');
+            });
+
+            $('#transactionButton').click(function() {
+                $('#allocationModal').modal('hide');
+                $('#add-transaction-form').modal('show');
+            });
+
+            $('#allocate_budget').closest('.form-check').hide();
+            $('#budgetSection').hide();
+
+            $('#category').change(function() {
+                const selectedCategory = $(this).val();
+                if (selectedCategory) {
+                    $('#allocate_budget').closest('.form-check').show();
+                } else {
+                    $('#allocate_budget').closest('.form-check').hide();
+                    $('#budgetSection').hide();
+                }
+            });
+
+            function populateBudgetDropdown(selector, category) {
+                $.ajax({
+                    url: '/getBudgetByCategory',
+                    method: 'GET',
+                    dataType: 'json',
+                    data: {
+                        category: category
+                    },
+                    success: function(data) {
+                        let $dropdown = $(selector);
+                        $dropdown.empty();
+                        $dropdown.append($('<option>', {
+                            value: '',
+                            text: 'Select Budget',
+                            selected: true,
+                            disabled: true
+                        }));
+                        $.each(data, function(index, item) {
+                            $dropdown.append($('<option>', {
+                                value: item.id,
+                                text: item.title
+                            }));
+                        });
+                    },
+                    error: function() {
+                        alert('Failed to load data.');
+                    }
+                });
+            }
+
+            $('#category').change(function() {
+                const selectedCategory = $(this).val();
+                if (selectedCategory) {
+                    $('#allocate_budget').closest('.form-check').show();
+                    if ($('#allocate_budget').is(':checked')) {
+                        populateBudgetDropdown('#budget_id', selectedCategory);
+                    }
+                } else {
+                    $('#allocate_budget').closest('.form-check').hide();
+                    $('#budgetSection').hide();
+                }
+            });
+
+            $('#allocate_budget').change(function() {
+                if ($(this).is(':checked')) {
+                    $('#budgetSection').show();
+                    const selectedCategory = $('#category').val();
+                    populateBudgetDropdown('#budget_id', selectedCategory);
+                } else {
+                    $('#budgetSection').hide();
+                }
             });
         </script>
     @endpush

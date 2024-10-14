@@ -8,7 +8,9 @@ use App\Http\Requests\UpdateApparelsRequest;
 use App\Services\ApparelsService;
 use App\Services\ApparelTypeService;
 use App\Services\BrandsService;
+use App\Services\CategoryService;
 use App\Services\StyleService;
+use App\Services\WalletsService;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class ApparelsController extends Controller
@@ -17,13 +19,17 @@ class ApparelsController extends Controller
     protected $apparelTypeService;
     protected $brandsService;
     protected $styleService;
+    protected $categoryService;
+    protected $walletsService;
 
-    public function __construct(ApparelsService $apparelService, ApparelTypeService $apparelTypeService, BrandsService $brandsService, StyleService $styleService)
+    public function __construct(ApparelsService $apparelService, ApparelTypeService $apparelTypeService, BrandsService $brandsService, StyleService $styleService, CategoryService $categoryService, WalletsService $walletsService)
     {
         $this->apparelService = $apparelService;
         $this->apparelTypeService = $apparelTypeService;
         $this->brandsService = $brandsService;
         $this->styleService = $styleService;
+        $this->categoryService = $categoryService;
+        $this->walletsService = $walletsService;
     }
 
     /**
@@ -36,7 +42,9 @@ class ApparelsController extends Controller
         $brands = $this->brandsService->getAllBrands();
         $styles = $this->styleService->getAllStyle();
         $data = $this->apparelService->getDashboardData();
-        return view('apparels.index', compact('apparels', 'apparelType', 'brands', 'styles', 'data'));
+        $expenseCategory = $this->categoryService->getExpenseCategory();
+        $wallets = $this->walletsService->getUserWallets();
+        return view('apparels.index', compact('apparels', 'apparelType', 'brands', 'styles', 'data', 'expenseCategory', 'wallets'));
     }
 
     /**

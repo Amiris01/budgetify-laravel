@@ -208,71 +208,117 @@
         <div class="modal fade" id="view-modal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="viewModalLabel">
+                    <div class="modal-header bg-primary text-white py-2">
+                        <h5 class="modal-title" id="viewModalLabel">
                             <i class="fas fa-calendar-alt me-2"></i>Event Details
-                        </h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                        <div class="d-flex justify-content-center align-items-center mb-4">
-                            <div id="view-attachment"></div>
-                        </div>
-                        <div class="row">
+                    <div class="modal-body p-2">
+                        <div class="row g-2">
                             <div class="col-md-6">
-                                <div class="event-info">
-                                    <i class="fas fa-signature"></i>
-                                    <span class="info-label">Name:</span>
-                                    <span class="info-value" id="view-name"></span>
-                                </div>
-                                <div class="event-info">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <span class="info-label">Location:</span>
-                                    <span class="info-value" id="view-location"></span>
-                                </div>
-                                <div class="event-info">
-                                    <i class="fas fa-info-circle"></i>
-                                    <span class="info-label">Status:</span>
-                                    <span class="info-value" id="view-status"></span>
-                                </div>
-                                <div class="event-info">
-                                    <i class="fas fa-dollar-sign"></i>
-                                    <span class="info-label">Expenses (RM):</span>
-                                    <span class="info-value" id="view-expenses"></span>
-                                </div>
-                                <div class="event-info">
-                                    <i class="fas fa-comment"></i>
-                                    <span class="info-label">Remarks:</span>
-                                    <span class="info-value" id="view-remarks"></span>
+                                <div class="card h-100">
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title"><i class="fas fa-info-circle me-2 blue-icon"></i>Event Info
+                                        </h6>
+                                        <ul class="list-group list-group-flush small">
+                                            <li class="list-group-item py-1"><i
+                                                    class="fas fa-signature me-2 blue-icon"></i><strong>Name:</strong>
+                                                <span id="view-name"></span>
+                                            </li>
+                                            <li class="list-group-item py-1"><i
+                                                    class="fas fa-map-marker-alt me-2 blue-icon"></i><strong>Location:</strong>
+                                                <span id="view-location"></span>
+                                            </li>
+                                            <li class="list-group-item py-1"><i
+                                                    class="fas fa-info-circle me-2 blue-icon"></i><strong>Status:</strong>
+                                                <span id="view-status"></span>
+                                            </li>
+                                            <li class="list-group-item py-1"><i
+                                                    class="fas fa-dollar-sign me-2 blue-icon"></i><strong>Expenses
+                                                    (RM):</strong> <span id="view-expenses"></span></li>
+                                            <li class="list-group-item py-1"><i
+                                                    class="fas fa-comment me-2 blue-icon"></i><strong>Remarks:</strong>
+                                                <span id="view-remarks"></span>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="event-info">
-                                    <i class="fas fa-hourglass-start"></i>
-                                    <span class="info-label">Start Timestamp:</span>
-                                    <span class="info-value" id="view-start_timestamp"></span>
-                                </div>
-                                <div class="event-info">
-                                    <i class="fas fa-hourglass-end"></i>
-                                    <span class="info-label">End Timestamp:</span>
-                                    <span class="info-value" id="view-end_timestamp"></span>
-                                </div>
-                                <div class="event-info">
-                                    <i class="fas fa-clock"></i>
-                                    <span class="info-label">Created at:</span>
-                                    <span class="info-value" id="view-created_at"></span>
-                                </div>
-                                <div class="event-info">
-                                    <i class="fas fa-edit"></i>
-                                    <span class="info-label">Last Updated:</span>
-                                    <span class="info-value" id="view-updated_at"></span>
+                                <div class="card h-100">
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title"><i class="fas fa-clock me-2 blue-icon"></i>Time Info</h6>
+                                        <ul class="list-group list-group-flush small">
+                                            <li class="list-group-item py-1"><i
+                                                    class="fas fa-hourglass-start me-2 blue-icon"></i><strong>Start:</strong>
+                                                <span id="view-start_timestamp"></span>
+                                            </li>
+                                            <li class="list-group-item py-1"><i
+                                                    class="fas fa-hourglass-end me-2 blue-icon"></i><strong>End:</strong>
+                                                <span id="view-end_timestamp"></span>
+                                            </li>
+                                            <li class="list-group-item py-1"><i
+                                                    class="fas fa-clock me-2 blue-icon"></i><strong>Created:</strong> <span
+                                                    id="view-created_at"></span></li>
+                                            <li class="list-group-item py-1"><i
+                                                    class="fas fa-edit me-2 blue-icon"></i><strong>Updated:</strong> <span
+                                                    id="view-updated_at"></span></li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <hr>
-                        <h5><i class="fas fa-exchange-alt me-2"></i>Transaction History</h5>
-                        <div class="transaction-list" id="transaction-list">
-                            <!-- Transaction items will be dynamically added here -->
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <ul class="nav nav-tabs" id="eventTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="map-tab" data-bs-toggle="tab"
+                                            data-bs-target="#map" type="button" role="tab" aria-controls="map"
+                                            aria-selected="true">Map</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="image-tab" data-bs-toggle="tab"
+                                            data-bs-target="#image" type="button" role="tab" aria-controls="image"
+                                            aria-selected="false">Image</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="transactions-tab" data-bs-toggle="tab"
+                                            data-bs-target="#transactions" type="button" role="tab"
+                                            aria-controls="transactions" aria-selected="false">Transactions</button>
+                                    </li>
+                                </ul>
+                                <div class="tab-content" id="eventTabContent">
+                                    <div class="tab-pane fade show active" id="map" role="tabpanel"
+                                        aria-labelledby="map-tab">
+                                        <div class="card">
+                                            <div class="card-body p-2">
+                                                <canvas id="map-canvas" width="100%" height="200"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="image" role="tabpanel"
+                                        aria-labelledby="image-tab">
+                                        <div class="card">
+                                            <div class="card-body p-2">
+                                                <div id="view-attachment" class="text-center"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="transactions" role="tabpanel"
+                                        aria-labelledby="transactions-tab">
+                                        <div class="card">
+                                            <div class="card-body p-2">
+                                                <div class="transaction-list small" id="transaction-list"
+                                                    style="height: 200px; overflow-y: auto;">
+                                                    <!-- Transaction items will be dynamically added here -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -367,29 +413,29 @@
                         <form id="deleteForm" method="POST">
                             @csrf
                             @method('DELETE')
-                        <p class="mb-0">Are you sure you want to delete this event?</p>
+                            <p class="mb-0">Are you sure you want to delete this event?</p>
 
-                        <div id="transaction-options" class="mt-3" style="display: none;">
-                            <h6>Transactions associated with this event:</h6>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="transactionOption"
-                                    id="nullifyTransactions" value="nullify">
-                                <label class="form-check-label" for="nullifyTransactions">
-                                    Set transactions to no associated event
-                                </label>
+                            <div id="transaction-options" class="mt-3" style="display: none;">
+                                <h6>Transactions associated with this event:</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="transactionOption"
+                                        id="nullifyTransactions" value="nullify">
+                                    <label class="form-check-label" for="nullifyTransactions">
+                                        Set transactions to no associated event
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="transactionOption"
+                                        id="deleteTransactions" value="delete">
+                                    <label class="form-check-label" for="deleteTransactions">
+                                        Delete associated transactions
+                                    </label>
+                                </div>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="transactionOption"
-                                    id="deleteTransactions" value="delete">
-                                <label class="form-check-label" for="deleteTransactions">
-                                    Delete associated transactions
-                                </label>
-                            </div>
-                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+                        <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
                         </form>
                     </div>
                 </div>
@@ -483,6 +529,21 @@
                 color: #6c757d;
                 font-size: 0.8em;
             }
+
+            .modal-dialog {
+                max-height: 100vh;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+            }
+
+            .modal-content {
+                max-height: 100vh;
+            }
+
+            .blue-icon {
+                color: #007bff;
+            }
         </style>
     @endpush
 
@@ -531,7 +592,7 @@
 
                                     if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
                                         var imageElement = '<img src="' + attachmentUrl +
-                                            '" class="img-fluid mb-4" style="max-width: 100%; height: auto; max-height: 200px;">';
+                                            '" class="img-fluid" style="max-width: 100%; height: auto; max-height: 200px;">';
                                         $('#view-attachment').html(imageElement);
                                     } else {
                                         var linkElement = '<a href="' + attachmentUrl +
